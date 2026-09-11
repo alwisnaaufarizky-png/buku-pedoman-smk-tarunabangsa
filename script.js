@@ -99,36 +99,76 @@ document.addEventListener('DOMContentLoaded', () => {
     title.appendChild(shareBtn);
   });
 
-  // 5. FITUR LIVE SEARCH & TEXT HIGHLIGHTING
+  // 5. FITUR SEARCH LANGSUNG AUTO-SCROLL KE ATURAN / BAB TERKAIT
   const searchInput = document.getElementById('search-input');
   const mainContent = document.querySelector('main .card');
 
   if (searchInput && mainContent) {
     let searchDebounce = null;
 
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchDebounce);
-
-      searchDebounce = setTimeout(() => {
-        const query = e.target.value.trim().toLowerCase();
-
-        // Clear existing highlights
-        removeHighlights(mainContent);
-
-        if (query.length < 2) {
-          return;
-        }
-
-        // Apply highlighting
-        const matchCount = highlightTextNodes(mainContent, query);
-
-        if (matchCount > 0) {
-          showToast(`Ditemukan ${matchCount} kata kunci "${query}"`);
-        } else {
-          showToast(`Tidak ditemukan kata kunci "${query}"`, 'danger');
-        }
-      }, 300);
+    // Fungsi pencarian saat tombol 'Enter' ditekan
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        executeAutoScrollSearch();
+      }
     });
+
+    // Fungsi pencarian otomatis saat berhenti mengetik (debounce 500ms)
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        executeAutoScrollSearch();
+      }, 500);
+    });
+  }
+
+  function executeAutoScrollSearch() {
+    const query = searchInput.value.trim().toLowerCase();
+    removeHighlights(mainContent);
+
+    if (query.length < 2) return;
+
+    // Cari elemen paragraf, poin list, atau baris tabel yang mengandung kata kunci
+    const searchableElements = mainContent.querySelectorAll('p, li, tr, h2, h3');
+    let matchFound = false;
+    let targetElement = null;
+
+    for (const el of searchableElements) {
+      // Abaikan elemen pencarian di header atau tombol share
+      if (el.closest('header') || el.classList.contains('btn-share-link')) continue;
+
+      const text = el.textContent.toLowerCase();
+      if (text.includes(query)) {
+        matchFound = true;
+        targetElement = el;
+        
+        // Highlight kata kunci yang ditemukan
+        highlightTextNodes(el, query);
+        break; // Stop di hasil pertama untuk fokus scroll
+      }
+    }
+
+    if (matchFound && targetElement) {
+      // Gulir layar otomatis langsung menuju elemen yang dicari
+      targetElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+
+      // Efek animasi kilau sementara pada elemen yang ditemukan
+      targetElement.style.transition = 'background-color 0.5s ease';
+      const originalBg = targetElement.style.backgroundColor;
+      targetElement.style.backgroundColor = 'rgba(250, 204, 21, 0.3)';
+      
+      setTimeout(() => {
+        targetElement.style.backgroundColor = originalBg;
+      }, 2500);
+
+      showToast(`Menampilkan hasil pencarian: "${query}"`);
+    } else {
+      showToast('Aturan ini tidak ada di dalam buku pedoman', 'danger');
+    }
   }
 
   function removeHighlights(container) {
@@ -141,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function highlightTextNodes(node, query) {
-    let count = 0;
     if (node.nodeType === 3) { // Text node
       const val = node.nodeValue;
       const index = val.toLowerCase().indexOf(query);
@@ -154,15 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const after = node.splitText(index);
         after.nodeValue = after.nodeValue.substring(query.length);
         after.parentNode.insertBefore(mark, after);
-
-        count++;
       }
     } else if (node.nodeType === 1 && node.childNodes && !/^(script|style|button|mark)$/i.test(node.tagName)) {
       for (let i = 0; i < node.childNodes.length; i++) {
-        count += highlightTextNodes(node.childNodes[i], query);
+        highlightTextNodes(node.childNodes[i], query);
       }
     }
-    return count;
   }
 
   // 6. Logika Tombol Back to Top
