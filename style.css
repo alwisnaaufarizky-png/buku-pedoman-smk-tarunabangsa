@@ -848,5 +848,22 @@ footer {
   color: #166534;
   margin: 0;
 }
+
+  /* Styling Tombol Quick Copy Per Pasal */
+.btn-copy-pasal {
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-left: 8px;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.btn-copy-pasal:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
   
 }
