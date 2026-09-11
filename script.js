@@ -99,75 +99,105 @@ document.addEventListener('DOMContentLoaded', () => {
     title.appendChild(shareBtn);
   });
 
-  // 5. FITUR SEARCH LANGSUNG AUTO-SCROLL KE ATURAN / BAB TERKAIT
+  // 5. FITUR SEARCH MULTI-RESULT & NEXT RESULT ON ENTER/CLICK
   const searchInput = document.getElementById('search-input');
+  const searchIcon = document.querySelector('.search-icon');
   const mainContent = document.querySelector('main .card');
 
-  if (searchInput && mainContent) {
-    let searchDebounce = null;
+  let searchMatches = [];
+  let currentIndex = -1;
+  let lastQuery = '';
 
-    // Fungsi pencarian saat tombol 'Enter' ditekan
+  if (searchInput && mainContent) {
+    // Jalankan pencarian jika tombol Enter ditekan
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        executeAutoScrollSearch();
+        handleSearch();
       }
     });
 
-    // Fungsi pencarian otomatis saat berhenti mengetik (debounce 500ms)
-    searchInput.addEventListener('input', () => {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => {
-        executeAutoScrollSearch();
-      }, 500);
+    // Jalankan pencarian jika ikon kaca pembesar 🔍 diklik
+    if (searchIcon) {
+      searchIcon.style.cursor = 'pointer';
+      searchIcon.addEventListener('click', () => {
+        handleSearch();
+      });
+    }
+
+    // Reset pencarian jika teks dihapus
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+      if (query === '') {
+        removeHighlights(mainContent);
+        searchMatches = [];
+        currentIndex = -1;
+        lastQuery = '';
+      }
     });
   }
 
-  function executeAutoScrollSearch() {
+  function handleSearch() {
     const query = searchInput.value.trim().toLowerCase();
-    removeHighlights(mainContent);
 
-    if (query.length < 2) return;
+    if (query.length < 2) {
+      showToast('Ketik minimal 2 karakter', 'danger');
+      return;
+    }
 
-    // Cari elemen paragraf, poin list, atau baris tabel yang mengandung kata kunci
-    const searchableElements = mainContent.querySelectorAll('p, li, tr, h2, h3');
-    let matchFound = false;
-    let targetElement = null;
+    // Jika kata kunci baru, kumpulkan semua hasil pencarian dari awal
+    if (query !== lastQuery) {
+      removeHighlights(mainContent);
+      searchMatches = [];
+      currentIndex = 0;
+      lastQuery = query;
 
-    for (const el of searchableElements) {
-      // Abaikan elemen pencarian di header atau tombol share
-      if (el.closest('header') || el.classList.contains('btn-share-link')) continue;
+      const elements = mainContent.querySelectorAll('p, li, td, h2, h3');
 
-      const text = el.textContent.toLowerCase();
-      if (text.includes(query)) {
-        matchFound = true;
-        targetElement = el;
-        
-        // Highlight kata kunci yang ditemukan
-        highlightTextNodes(el, query);
-        break; // Stop di hasil pertama untuk fokus scroll
+      elements.forEach(el => {
+        if (el.classList.contains('btn-share-link')) return;
+
+        const text = el.textContent.toLowerCase();
+        if (text.includes(query)) {
+          searchMatches.push(el);
+          highlightTextNodes(el, query);
+        }
+      });
+
+      if (searchMatches.length === 0) {
+        showToast('Aturan ini tidak ada di dalam buku pedoman', 'danger');
+        return;
+      }
+    } else {
+      // Jika kata kunci sama dan ditekan Search/Enter lagi, lanjut ke hasil berikutnya
+      if (searchMatches.length > 0) {
+        currentIndex = (currentIndex + 1) % searchMatches.length;
       }
     }
 
-    if (matchFound && targetElement) {
-      // Gulir layar otomatis langsung menuju elemen yang dicari
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
+    if (searchMatches.length > 0) {
+      const targetElement = searchMatches[currentIndex];
+
+      // Hitung posisi offset agar tidak tertutup header
+      const headerHeight = document.querySelector('header') ? document.querySelector('header').offsetHeight : 80;
+      const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+      const offsetPosition = elementPosition - headerHeight - 30;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
       });
 
-      // Efek animasi kilau sementara pada elemen yang ditemukan
-      targetElement.style.transition = 'background-color 0.5s ease';
+      // Animasi kilau kuning sementara pada elemen aktif
+      targetElement.style.transition = 'background-color 0.4s ease';
       const originalBg = targetElement.style.backgroundColor;
-      targetElement.style.backgroundColor = 'rgba(250, 204, 21, 0.3)';
+      targetElement.style.backgroundColor = '#facc15';
       
       setTimeout(() => {
         targetElement.style.backgroundColor = originalBg;
-      }, 2500);
+      }, 1800);
 
-      showToast(`Menampilkan hasil pencarian: "${query}"`);
-    } else {
-      showToast('Aturan ini tidak ada di dalam buku pedoman', 'danger');
+      showToast(`Hasil ${currentIndex + 1} dari ${searchMatches.length} untuk "${query}"`);
     }
   }
 
@@ -181,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function highlightTextNodes(node, query) {
-    if (node.nodeType === 3) { // Text node
+    if (node.nodeType === 3) {
       const val = node.nodeValue;
       const index = val.toLowerCase().indexOf(query);
 
