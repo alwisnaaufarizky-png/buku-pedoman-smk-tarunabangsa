@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --tb-green-dark: #0c4128;
   --tb-green-light: #15803d;
@@ -75,7 +79,9 @@ header {
   display: none;
 }
 
-/* SEARCH BOX STYLING */
+/* ==========================================
+   SEARCH BOX & HIGHLIGHT STYLING
+   ========================================== */
 .search-box {
   display: flex;
   align-items: center;
@@ -111,7 +117,7 @@ header {
 
 mark.highlight {
   background-color: var(--tb-yellow);
-  color: #000;
+  color: #000000;
   padding: 0 3px;
   border-radius: 3px;
   font-weight: bold;
@@ -215,12 +221,6 @@ main {
   padding: 0 5px;
 }
 
-@media (max-width: 900px) {
-  .btn-close-sidebar {
-    display: block;
-  }
-}
-
 .card {
   background: var(--tb-card-bg);
   padding: 30px 40px;
@@ -248,7 +248,7 @@ h1.doc-title {
   border-bottom: 1px solid var(--tb-border);
 }
 
-/* FIX UTAMA: STYLING SECTION TITLE & TOMBOL SHARE */
+/* Section Title & Tombol Share */
 h2.section-title,
 .section-title {
   color: var(--tb-green-dark);
@@ -349,7 +349,7 @@ table tbody tr:nth-child(even) {
   background-color: #f9fafb;
 }
 
-/* Tombol Hamburger */
+/* Tombol Hamburger Header */
 .menu-toggle-btn {
   display: none;
   background: transparent;
@@ -395,7 +395,7 @@ footer {
    ========================================== */
 .btn-back-to-top {
   position: fixed !important;
-  bottom: 90px !important; /* Ditinggikan agar di atas tombol WA */
+  bottom: 90px !important;
   right: 25px !important;
   width: 50px !important;
   height: 50px !important;
@@ -425,7 +425,6 @@ footer {
   transform: translateY(-5px) !important;
 }
 
-/* Styling Floating WhatsApp Button */
 .float-wa {
   position: fixed;
   width: 55px;
@@ -466,7 +465,7 @@ footer {
   border-radius: 8px;
   margin-top: 10px;
   font-size: 0.9rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -478,12 +477,21 @@ footer {
 }
 
 @keyframes slideIn {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-  to { opacity: 0; transform: translateY(10px); }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 /* ==========================================
@@ -517,6 +525,10 @@ footer {
 
   .menu-toggle-btn {
     display: flex;
+  }
+
+  .btn-close-sidebar {
+    display: block;
   }
 
   aside {
@@ -617,7 +629,7 @@ footer {
   .print-title h2 {
     font-size: 16pt !important;
     margin-bottom: 4px;
-    color: #000;
+    color: #000000;
     font-weight: bold;
     letter-spacing: 0.5px;
   }
@@ -625,7 +637,7 @@ footer {
   .print-title p {
     font-size: 9.5pt !important;
     margin: 2px 0;
-    color: #222;
+    color: #222222;
   }
 
   .app-container,
