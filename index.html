@@ -623,6 +623,26 @@
               </tbody>
             </table>
           </div>
+
+          <!-- SIMULATOR POIN SANKSI VISUAL -->
+          <div class="penalty-gauge-card">
+            <h3>🎮 Simulasi & Kalkulator Level Sanksi</h3>
+            <p>Geser slider untuk melihat status pembinaan berdasarkan sanksi poin yang dimiliki:</p>
+            
+            <div class="gauge-slider-container">
+              <label for="point-slider">Sisa Poin: <span id="point-display">100</span> / 100</label>
+              <input type="range" id="point-slider" min="0" max="100" value="100" step="5">
+            </div>
+
+            <div class="gauge-bar-wrapper">
+              <div id="gauge-bar-fill" class="gauge-bar-fill" style="width: 100%;"></div>
+            </div>
+
+            <div class="gauge-status-box" id="gauge-status-box">
+              <span id="gauge-status-title">STATUS: AMAN</span>
+              <p id="gauge-status-desc">Siswa dalam kondisi sangat baik dan tidak memiliki catatan sanksi pembinaan.</p>
+            </div>
+          </div>
 <!-- PENGESAHAN BAB V -->
 
         </section>
