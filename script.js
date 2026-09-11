@@ -1,5 +1,66 @@
 document.addEventListener('DOMContentLoaded', () => {
+// LOGIKA SIMULATOR LEVEL SANKSI POIN
+  const pointSlider = document.getElementById('point-slider');
+  const pointDisplay = document.getElementById('point-display');
+  const gaugeFill = document.getElementById('gauge-bar-fill');
+  const statusBox = document.getElementById('gauge-status-box');
+  const statusTitle = document.getElementById('gauge-status-title');
+  const statusDesc = document.getElementById('gauge-status-desc');
 
+  if (pointSlider) {
+    pointSlider.addEventListener('input', (e) => {
+      const points = parseInt(e.target.value);
+      pointDisplay.textContent = points;
+      gaugeFill.style.width = `${points}%`;
+
+      if (points > 80) {
+        // Status Aman (100 - 81)
+        gaugeFill.style.backgroundColor = '#22c55e';
+        statusBox.style.backgroundColor = '#dcfce7';
+        statusBox.style.borderLeftColor = '#22c55e';
+        statusTitle.style.color = '#15803d';
+        statusTitle.textContent = 'STATUS: AMAN / SANGAT BAIK';
+        statusDesc.style.color = '#166534';
+        statusDesc.textContent = 'Siswa dalam kondisi aman dan belum membutuhkan tindakan pembinaan khusus.';
+      } else if (points > 60) {
+        // Status SP-1 (80 - 61)
+        gaugeFill.style.backgroundColor = '#eab308';
+        statusBox.style.backgroundColor = '#fef9c3';
+        statusBox.style.borderLeftColor = '#eab308';
+        statusTitle.style.color = '#a16207';
+        statusTitle.textContent = '⚠️ SANKSI: SURAT PERINGATAN 1 (SP-1)';
+        statusDesc.style.color = '#854d0e';
+        statusDesc.textContent = 'Pembinaan oleh Wali Kelas, Pembina Kesiswaan, dan Pemanggilan Orang Tua/Wali.';
+      } else if (points > 40) {
+        // Status SP-2 (60 - 41)
+        gaugeFill.style.backgroundColor = '#f97316';
+        statusBox.style.backgroundColor = '#ffedd5';
+        statusBox.style.borderLeftColor = '#f97316';
+        statusTitle.style.color = '#c2410c';
+        statusTitle.textContent = '⚠️ SANKSI: SURAT PERINGATAN 2 (SP-2)';
+        statusDesc.style.color = '#9a3412';
+        statusDesc.textContent = 'Pembinaan intensif oleh Wakasek Kesiswaan, Tim BP/BK, dan Psikolog Sekolah.';
+      } else if (points > 30) {
+        // Status Surat Perjanjian (40 - 31)
+        gaugeFill.style.backgroundColor = '#ef4444';
+        statusBox.style.backgroundColor = '#fee2e2';
+        statusBox.style.borderLeftColor = '#ef4444';
+        statusTitle.style.color = '#b91c1c';
+        statusTitle.textContent = '🚨 BAHAYA: SURAT PERJANJIAN & PERNYATAAN';
+        statusDesc.style.color = '#991b1b';
+        statusDesc.textContent = 'Siswa terancam tidak naik kelas dan wajib menandatangani Surat Perjanjian Khusus.';
+      } else {
+        // Status SP-3 / Dikeluarkan (30 - 0)
+        gaugeFill.style.backgroundColor = '#7f1d1d';
+        statusBox.style.backgroundColor = '#fecdd3';
+        statusBox.style.borderLeftColor = '#7f1d1d';
+        statusTitle.style.color = '#881337';
+        statusTitle.textContent = '⛔ SANKSI MAX: SP-3 / DIKELUARKAN';
+        statusDesc.style.color = '#4c0519';
+        statusDesc.textContent = 'Batas pengurangan poin penuh (100). Siswa dikembalikan kepada Orang Tua / Wali Murid.';
+      }
+    });
+  }
   // 1. Fitur Auto-Hide Header saat Scroll ke Bawah
   let lastScrollTop = 0;
   const header = document.querySelector('header');
